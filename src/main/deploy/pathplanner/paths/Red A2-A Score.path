@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 16.85771004098361,
+        "y": 1.382
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 16.312983552797924,
+        "y": 1.9917873667031119
+      },
+      "isLocked": false,
+      "linkedName": "Red Coral A2"
+    },
+    {
+      "anchor": {
+        "x": 14.457,
+        "y": 3.809
+      },
+      "prevControl": {
+        "x": 15.131930621562013,
+        "y": 3.1199819528051234
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Red Reef A"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.5,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0.0,
+    "rotation": 180.0
+  },
+  "reversed": false,
+  "folder": "Red A2 Paths",
+  "idealStartingState": {
+    "velocity": 0.0,
+    "rotation": 125.00000000000001
+  },
+  "useDefaultConstraints": true
+}

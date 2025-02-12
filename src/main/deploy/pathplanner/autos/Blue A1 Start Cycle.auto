@@ -1,0 +1,133 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Blue Start 1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "BlueA1L4Score"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Blue A1-I Load"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WaitForLoad"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Blue A1-J Score"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "BlueJScore"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Blue A1-J Load"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WaitForLoad"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Blue A1-A Score"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "BlueAScore"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Blue A1-A Load"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WaitForLoad"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Blue A1-K Score"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "BlueKScore"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Blue A1-K Load"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WaitForLoad"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Blue A1-L Score"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "BlueLScore"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Blue A1-L Load"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WaitForLoad"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

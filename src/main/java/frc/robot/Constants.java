@@ -6,11 +6,14 @@ package frc.robot;
 
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
+import com.pathplanner.lib.config.PIDConstants;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -21,6 +24,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import frc.robot.utils.TargetPose;
 import frc.robot.utils.vision.VisionConfig;
 
 /**
@@ -118,10 +122,14 @@ public final class Constants {
     public static final Translation2d m_frontRightLocation = new Translation2d(0.381, -0.381);
     public static final Translation2d m_backLeftLocation = new Translation2d(-0.381, 0.381);
     public static final Translation2d m_backRightLocation = new Translation2d(-0.381, -0.381);
+
+    public static final Translation2d[] m_ModulePositions = new Translation2d[] { m_frontRightLocation, m_frontLeftLocation, m_backRightLocation, m_backLeftLocation };
+
     // Creating my kinematics object using the module locations
     public static final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
     m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation
     );
+
     // Angular offsets of the modules relative to the chassis in radians
     public static final double kFrontLeftChassisAngularOffset = -Math.PI / 2;
     public static final double kFrontRightChassisAngularOffset = 0;
@@ -131,6 +139,9 @@ public final class Constants {
     // SPARK MAX CAN IDs are in RobotMap
 
     public static final boolean kGyroReversed = false;
+
+    // Distance from robot center to furthest module
+    public static final double kBaseRadius = Units.inchesToMeters(RobotMap.R_BASE_RADIUS_INCHES);
   }
 
   public static final class ModuleConstants {
@@ -159,7 +170,7 @@ public final class Constants {
     public static final double kMaxSpeedMetersPerSecond = 4.8;
     public static final double kMaxAccelerationMetersPerSecondSquared = 3;
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
-    public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
+    public static final double kMaxAngularAccelerationRadiansPerSecondSquared = Math.PI;
 
     public static final double kPXController = 1;
     public static final double kPYController = 1;
@@ -170,7 +181,18 @@ public final class Constants {
 
     // Constraint for the motion profiled robot angle controller
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
-        kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
+        kMaxAngularSpeedRadiansPerSecond, kMaxAngularAccelerationRadiansPerSecondSquared);
+
+    // AutoBuilder dynamic robot constriants
+    public static final PIDConstants kPathFollowerTranslationPID = new PIDConstants(5.0, 0.0, 0.0); // Translation PID constants
+    public static final PIDConstants kPathFollowerRotationPID = new PIDConstants(5.0, 0.0, 0.0); // Rotation PID constants    
+
+    public static final double kPathFollowerMaxSpeed = Constants.kMaxSpeedMetersPerSecond; // Max module speed, in m/s
+    public static final double kPathFollowerBaseRadius = DriveConstants.kBaseRadius; // Drive base radius in meters
+    public static final double kPathFollowerMass = 52.1631; // 115 pounds
+    public static final double kPathFollowerMomentOfInertia = 6.2; // Total guess. Rough estimate of l^2 + w^2 * m * 1/12
+    public static final double kPathFollowerWheelCoeficientFriction = 1.2; // Total guess. pathplaner default
+
   }
 
   public static final class NeoMotorConstants {
@@ -260,4 +282,17 @@ public final class Constants {
 
     //Enables SysID Characterization Mode. !!Should be false during competitions. Can cause the Operator controller to be remapped!!
     public static final boolean kSysIdModeEnabled = false;
+
+
+    public static final TargetPose kBlueReefAPose = new TargetPose(new Pose2d(3.111, 4.187, new Rotation2d(Units.degreesToRadians(0))));
+    public static final TargetPose kBlueReefBPose = new TargetPose(new Pose2d(3.129, 3.809, new Rotation2d(Units.degreesToRadians(0))));
+    public static final TargetPose kBlueCoralA1Pose = new TargetPose(new Pose2d(1.690, 7.334, new Rotation2d(Units.degreesToRadians(-50))), true);
+    public static final TargetPose kBlueCoralA2Pose = new TargetPose(new Pose2d(0.773, 6.668, new Rotation2d(Units.degreesToRadians(-50))), true);
+
+    public static final TargetPose kRedReefAPose = new TargetPose(new Pose2d(14.457, 3.809, new Rotation2d(Units.degreesToRadians(180))));
+    public static final TargetPose kRedReefBPose = new TargetPose(new Pose2d(14.457, 4.187, new Rotation2d(Units.degreesToRadians(180))));
+    public static final TargetPose kRedReefKPose = new TargetPose(new Pose2d(13.585, 2.730, new Rotation2d(Units.degreesToRadians(120))));
+    public static final TargetPose kRedReefLPose = new TargetPose(new Pose2d(13.900, 2.910, new Rotation2d(Units.degreesToRadians(120))));
+    public static final TargetPose kRedCoralA1Pose = new TargetPose(new Pose2d(15.878, 0.773, new Rotation2d(Units.degreesToRadians(125))), true);
+    public static final TargetPose kRedCoralA2Pose = new TargetPose(new Pose2d(16.858, 1.382, new Rotation2d(Units.degreesToRadians(125))), true);
 }

@@ -5,6 +5,9 @@
 package frc.robot.subsystems;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.ModuleConfig;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -19,14 +22,18 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.math.Matrix;
 import frc.robot.Constants;
+import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.RobotMap;
 import frc.robot.testingdashboard.*;
 import frc.robot.utils.SwerveUtils;
@@ -34,7 +41,7 @@ import frc.robot.utils.FieldUtils;
 
 public class Drive extends SubsystemBase {
   private static Drive m_Drive;
-  private final Field2d m_field;
+  public final Field2d m_field;
 
   private final MAXSwerveModule m_FrontLeft = new MAXSwerveModule(
     RobotMap.D_FRONT_LEFT_DRIVE, 
@@ -135,7 +142,34 @@ public class Drive extends SubsystemBase {
     m_TLeftFrontCurrentOutput = new TDNumber(this, "Current", "Steering Front Left Output");
     m_TRightFrontCurrentOutput = new TDNumber(this, "Current", "Steering Front Right Output");
     m_TLeftBackCurrentOutput = new TDNumber(this, "Current", "Steering Back Left Output");
-    m_TRightBackCurrentOutput = new TDNumber(this, "Current", "Steering Back Right Output");  }
+    m_TRightBackCurrentOutput = new TDNumber(this, "Current", "Steering Back Right Output");  
+
+        // Configure AutoBuilder last
+    DCMotor neovortex = DCMotor.getNeoVortex(1);
+    
+    ModuleConfig kSwerveModuleConfig = new ModuleConfig(Constants.kWheelDiameterMeters/2, Constants.kMaxSpeedMetersPerSecond, 
+          AutoConstants.kPathFollowerWheelCoeficientFriction, neovortex, Constants.kDrivingMotorCurrentLimit, 4);
+    AutoBuilder.configure(
+      this::getPose, // Robot pose supplier
+      this::resetOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
+      this::getMeasuredSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+      (speeds, feedforwards) -> drive(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+      new PPHolonomicDriveController(AutoConstants.kPathFollowerTranslationPID, AutoConstants.kPathFollowerRotationPID),
+      new RobotConfig(AutoConstants.kPathFollowerMass, AutoConstants.kPathFollowerMomentOfInertia, kSwerveModuleConfig, DriveConstants.m_ModulePositions),
+      () -> {
+        // Boolean supplier that controls when the path will be mirrored for the red alliance
+        // This will flip the path being followed to the red side of the field.
+        // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+        var alliance = DriverStation.getAlliance();
+        if (alliance.isPresent()) {
+          return alliance.get() == DriverStation.Alliance.Red;
+        }
+        return false;
+      },
+      this // Reference to this subsystem to set requirements
+    );
+  }
 
   public static Drive getInstance() {
     if(m_Drive == null){

@@ -12,8 +12,17 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants;
+ 
+public class FieldUtils {
 
-public class FieldUtils{
+    public enum ApproachType {
+        c_LeftApproach,
+        c_RightApproach,
+        c_LeftSpin,
+        c_RightSpin,
+        c_Straight
+    }
+    
     private static FieldUtils m_fieldUtils;
 
     public static final AllianceAprilTags RedTags = new AllianceAprilTags(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11);
@@ -61,5 +70,45 @@ public class FieldUtils{
         Translation2d targetTrans = targetPose.getTranslation();
         Translation2d toTarget = targetTrans.minus(curTrans);
         return toTarget.getAngle();
+    }
+    
+    public TargetPose getBlueReefAPose() {
+        return Constants.kBlueReefAPose;
+    }
+
+    public TargetPose getBlueReefBPose() {
+        return Constants.kBlueReefBPose;
+    }
+    
+    public TargetPose getBlueCoralA1Pose() {
+        return Constants.kBlueCoralA1Pose;
+    }
+
+    public TargetPose getBlueCoralA2Pose() {
+        return Constants.kBlueCoralA2Pose;
+    }
+    
+    public TargetPose getRedReefAPose() {
+        return Constants.kRedReefAPose;
+    }
+
+    public TargetPose getRedReefBPose() {
+        return Constants.kRedReefBPose;
+    }
+        
+    public TargetPose getRedReefKPose() {
+        return Constants.kRedReefKPose;
+    }
+
+    public TargetPose getRedReefLPose() {
+        return Constants.kRedReefLPose;
+    }
+
+    public TargetPose getRedCoralA1Pose() {
+        return Constants.kRedCoralA1Pose;
+    }
+
+    public TargetPose getRedCoralA2Pose() {
+        return Constants.kRedCoralA2Pose;
     }
 }
