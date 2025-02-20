@@ -43,8 +43,8 @@ public final class Constants {
     public static final double kAngleI = 0;
     public static final double kAngleD = 0;
 
-    public static final double kAngleSpeed = 1;
-    public static final double kAngleSpeedRPM = 3000;
+    public static final double kAngleSpeed = 0.2;
+    public static final double kAngleSpeedRPM = 30;
 
     public static final double kAngleLowerLimitDegrees = 0;
     public static final double kAngleUpperLimitDegrees = 0;
@@ -59,8 +59,8 @@ public final class Constants {
     public static final double kRollerI = 0;
     public static final double kRollerD = 0;
 
-    public static final double kRollerSpeed = 1;
-    public static final double kRollerSpeedRPM = 3000;
+    public static final double kRollerSpeed = 0.2;
+    public static final double kRollerSpeedRPM = 30;
 
     public static final double DEGREES_PER_REVOLUTION = 360;
   }
@@ -72,8 +72,8 @@ public final class Constants {
     public static final double kWoSI = 0;
     public static final double kWoSD = 0;
 
-    public static final double kWoSSpeed = 1;
-    public static final double kWoSSpeedRPM = 3000;
+    public static final double kWoSSpeed = 0.2;
+    public static final double kWoSSpeedRPM = 30;
 
     public static final boolean kEnableShoulderPIDTuning = true;
     public static final double kShoulderP = 0;
@@ -83,8 +83,8 @@ public final class Constants {
     public static final double kShoulderkG = 0;
     public static final double kShoulderkV = 0;
 
-    public static final double kWoSShoulderSpeed = 1;
-    public static final double kWoSShoulderSpeedRPM = 3000;
+    public static final double kWoSShoulderSpeed = 0.2;
+    public static final double kWoSShoulderSpeedRPM = 30;
     
     public static final double kWoSShoulderEncoderPositionFactor = (2 * Math.PI);
     public static final double kWoSShoulderEncoderVelocityFactor = (2 * Math.PI / 60.0);
@@ -99,6 +99,8 @@ public final class Constants {
       0,
       0
     };
+
+    public static final double kEatAngle = 0;
   }
 
   public static final class ElevatorConstants {
@@ -113,8 +115,8 @@ public final class Constants {
 
     public static final double kElevatorMaxVelocity = 0;
     public static final double kElevatorMaxAcceleration = 0;
-    public static final double kElevatorSpeed = 1;
-    public static final double kElevatorSpeedRPM = 3000;
+    public static final double kElevatorSpeed = 0.2;
+    public static final double kElevatorSpeedRPM = 30;
 
     public static final double kElevatorEncoderPositionFactor = (2 * Math.PI);
 
@@ -137,7 +139,7 @@ public final class Constants {
     public static final double kFunnelD = 0;
 
     public static final double kFunnelSpeed = 0.2;
-    public static final double kFunnelSpeedRPM = 3000;
+    public static final double kFunnelSpeedRPM = 30;
   }
 
   public static final class LightsConstants {

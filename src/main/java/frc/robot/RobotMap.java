@@ -91,7 +91,7 @@ public class RobotMap {
   public static int D_BACK_RIGHT_TURNING = RoboRioMap.CAN_7;
 
   // [E]levator
-  public static boolean E_ENABLED = true;
+  public static boolean E_ENABLED = false;
   public static int E_LEFTMOTOR = RoboRioMap.CAN_11;
   public static int E_RIGHTMOTOR = RoboRioMap.CAN_12;
 
@@ -108,7 +108,7 @@ public class RobotMap {
 	public static int U_OPERATOR_XBOX_CONTROLLER = 1;
 
   //[V]ision
-  public static boolean V_ENABLED = true;
+  public static boolean V_ENABLED = false;
 
   //[W]oS
   public static boolean W_ENABLED = true;
@@ -116,12 +116,12 @@ public class RobotMap {
   public static int W_SHOULDERMOTOR = RoboRioMap.CAN_17;
 
   //[A]lgae Intake
-  public static boolean A_ENABLED = true;
+  public static boolean A_ENABLED = false;
   public static int A_ANGLEMOTOR = RoboRioMap.CAN_15;
   public static int A_ROLLERMOTOR = RoboRioMap.CAN_16;
   public static int A_INTAKESENSOR = RoboRioMap.DIO_0;
 
   //[C]limber
-  public static boolean C_ENABLED = true;
+  public static boolean C_ENABLED = false;
   public static int C_WINCHMOTOR = RoboRioMap.CAN_18;
 }
