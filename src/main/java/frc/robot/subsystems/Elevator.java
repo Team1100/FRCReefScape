@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import java.time.Instant;
+
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -90,6 +92,10 @@ public class Elevator extends SubsystemBase {
   double m_shoulderkG = Constants.ElevatorConstants.kShoulderkG;
   double m_shoulderkV = Constants.ElevatorConstants.kShoulderkV;
   private double m_shoulderLastAngle = 0;
+  
+  private double r;
+  private double curr_r;
+  private boolean pid_running;
 
   SparkMax m_WoSSparkMax;
   SparkMaxConfig m_SparkMaxConfig;
@@ -136,6 +142,9 @@ public class Elevator extends SubsystemBase {
 
       m_leftSparkFlexConfig = new SparkFlexConfig();
       SparkFlexConfig rightElevatorSparkFlexConfig = new SparkFlexConfig();
+
+      r = getElevatorAngle();
+      pid_running = false;
 
       rightElevatorSparkFlexConfig.follow(m_elevatorLeftSparkFlex, true);
 
@@ -242,6 +251,78 @@ public class Elevator extends SubsystemBase {
 
   public double getElevatorAngle() {
     return m_elevatorAbsoluteEncoder.getPosition();
+  }
+
+  public void elevatorToPosition(double angle) {
+    if (pid_running) {
+      r = angle;
+      return;
+    }
+    pid_running = true;
+    r = angle;
+    curr_r = getElevatorAngle();
+
+    Thread elevatorThread = new Thread(() -> {
+      double x1 = getElevatorAngle();
+      double x2 = 0.0;
+      double sigma = 0.0;
+      double y;
+
+      double alpha = 50;
+      double beta = 20;
+
+      double Umax = 12.0;
+      double lambda_e = 20.0;
+      double lambda_r = 50.0;
+
+      double l1 = 2 * lambda_e - alpha;
+      double l2 = lambda_e * lambda_e - 2 * alpha * lambda_e + alpha * alpha;
+
+      double k1 = 1/beta * 3 * lambda_r *lambda_r;
+      double k2 = 1/beta * (3*lambda_r - a);
+      double k3 = 1/beta * lambda_r * lambda_r * lambda_r;
+      double kappa = lambda_r / k3;
+      
+      boolean done = false;
+      Instant start = Instant.now();
+
+      while (!done) {
+        Instant end = Instant.now();
+        Duration timeElapsed = Duration.between(start, end);
+        if (timeElapsed.toMillis() % 1 == 0.0) {
+          if (timeElapsed.toNanos() % 10000 == 0.0) {
+	        	if (curr_r < .99 * r) {
+		        	curr_r += 500 * .001 * timeElapsed.toSeconds();
+		        } else if (curr_r > .99 * r) {
+		        	curr_r -= 500 * .001 * timeElapsed.toSeconds();
+		        } else {
+		        	curr_r = r;
+		        }
+            y = getElevatorAngle();
+            if (y > .99*r || y < 1.01*r) {
+              m_elevatorLeftSparkFlex.setVoltage(0.0);
+              done = true;
+              pid_running = false;
+              continue;
+            }
+            float uc = -k1*x1 - k2*x2-k3*sigma;
+            float u;
+            if (uc < -1*Umax) {
+              u = -1*Umax;
+            } else if (uc > Umax) {
+              u = Umax;
+            } else {
+              u = uc;
+            }
+            m_elevatorLeftSparkFlex.setVoltage(u);
+            x1 = x1 + T * (x2 - l1*(x1 - y));
+            x2 = x2 + T * (alpha*u - beta - l2*(x1 -y));
+            sigma = sigma + T*(y - curr_r + kappa*(uc -u));
+          }
+        }
+      }
+    });
+    elevatorThread.start();
   }
 
   public void setElevatorTargetAngle(double angle) {
