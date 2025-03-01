@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.Instant;
 
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -253,7 +255,62 @@ public class Elevator extends SubsystemBase {
     return m_elevatorAbsoluteEncoder.getPosition();
   }
 
+  /**
+	 * This function conducts an experiment used to identify parameters about the plant
+	 * Outputs from this experiment will be filtered in MATLAB to obtain plant parameters
+	 */
+	public static void paramID() {
+		// Define output array
+		double[] output = new double[2000];
+		
+		Instant start = Instant.now();
+	      
+		for (int i = 0; i < output.length; i++) {
+			//Wait until 1 ms has passed
+			Instant end = Instant.now();
+			Duration timeElapsed = Duration.between(start, end);
+			while (timeElapsed.toNanos() / 1000000 == 0) {
+				end = Instant.now();
+				timeElapsed = Duration.between(start, end);
+			}
+			start = Instant.now();
+			
+			// Actuate plant
+			if (i < 500) {
+				m_elevatorLeftSparkFlex.setVoltage(6.0);
+			} else if (i > 1000 && i < 1250){
+				m_elevatorLeftSparkFlex.setVoltage(-6.0);
+			} else {
+				m_elevatorLeftSparkFlex.setVoltage(0.0);
+			}
+			
+			// Read plant response
+			output[i] = getElevatorAngle();
+		}
+		
+		// Write to .csv for data processing
+		try (FileWriter writer = new FileWriter("param.csv")) {
+            for (int i = 0; i < output.length; i++) {
+                writer.append(String.valueOf(output[i]));
+                if (i < output.length - 1) {
+                    writer.append(",");
+                }
+            }
+            writer.append("\n");
+            System.out.println("CSV file created: " + "param.csv");
+        } catch (IOException e) {
+            System.err.println("Error writing to file: " + e.getMessage());
+        }
+	}
+
+  /**
+	 * This function acts as a state space PI controller for the elevator
+	 * Plant parameters: alpha, beta
+	 * Other constants: calculated using method learned in Control Systems class.
+	 * @param angle - the desired elevator setpoint
+	 */
   public void elevatorToPosition(double angle) {
+    // If elevator is already being driven to setpoint, simply update reference command
     if (pid_running) {
       r = angle;
       return;
@@ -262,19 +319,30 @@ public class Elevator extends SubsystemBase {
     r = angle;
     curr_r = getElevatorAngle();
 
+    // If elevator is at rest, start new Thread
     Thread elevatorThread = new Thread(() -> {
+      // Initialize state variables
+      // x1 = motor angle
+      // x2 = motor velocity (which we presume starts at zero) - can be swapped for a getVelocity() api call
+      // sigma = regulator (proportional control) state variable
       double x1 = getElevatorAngle();
       double x2 = 0.0;
       double sigma = 0.0;
       double y;
 
+      // Plant parameters (TBD via parameter ID function)
       double alpha = 50;
       double beta = 20;
 
+      // Max input allowed (Volts)
       double Umax = 12.0;
+
+      // Bandwidth variables (control system tuning knobs)
+	    // Lower values --> slower response, higher overshoot
       double lambda_e = 20.0;
       double lambda_r = 50.0;
 
+      // Coefficient Matrix values
       double l1 = 2 * lambda_e - alpha;
       double l2 = lambda_e * lambda_e - 2 * alpha * lambda_e + alpha * alpha;
 
@@ -289,36 +357,44 @@ public class Elevator extends SubsystemBase {
       while (!done) {
         Instant end = Instant.now();
         Duration timeElapsed = Duration.between(start, end);
-        if (timeElapsed.toMillis() % 1 == 0.0) {
-          if (timeElapsed.toNanos() % 10000 == 0.0) {
-	        	if (curr_r < .99 * r) {
-		        	curr_r += 500 * .001 * timeElapsed.toSeconds();
-		        } else if (curr_r > .99 * r) {
-		        	curr_r -= 500 * .001 * timeElapsed.toSeconds();
-		        } else {
-		        	curr_r = r;
-		        }
-            y = getElevatorAngle();
-            if (y > .99*r || y < 1.01*r) {
-              m_elevatorLeftSparkFlex.setVoltage(0.0);
-              done = true;
-              pid_running = false;
-              continue;
-            }
-            float uc = -k1*x1 - k2*x2-k3*sigma;
-            float u;
-            if (uc < -1*Umax) {
-              u = -1*Umax;
-            } else if (uc > Umax) {
-              u = Umax;
-            } else {
-              u = uc;
-            }
-            m_elevatorLeftSparkFlex.setVoltage(u);
-            x1 = x1 + T * (x2 - l1*(x1 - y));
-            x2 = x2 + T * (alpha*u - beta - l2*(x1 -y));
-            sigma = sigma + T*(y - curr_r + kappa*(uc -u));
+        if (timeElapsed.toNanos() / 1000000 > 0.0) {
+          if (curr_r < .999 * r) {
+            curr_r += 500 * .001 * timeElapsed.toSeconds();
+          } else if (curr_r > 1.001 * r) {
+            curr_r -= 500 * .001 * timeElapsed.toSeconds();
+          } else {
+            curr_r = r;
           }
+          start = Instant.now();
+          y = getElevatorAngle();
+
+          // Check if reference angle reached
+          // *NOTE* - This assumes bandwidth variables are set so that system does not overshoot
+          if (y > .999*r || y < 1.001*r) {
+            m_elevatorLeftSparkFlex.setVoltage(0.0);
+            done = true;
+            pid_running = false;
+            continue;
+          }
+
+          // Compute actuator input
+          float uc = -k1*x1 - k2*x2-k3*sigma;
+          float u;
+          if (uc < -1*Umax) {
+            u = -1*Umax;
+          } else if (uc > Umax) {
+            u = Umax;
+          } else {
+            u = uc;
+          }
+
+          //Actuate Elevator
+          m_elevatorLeftSparkFlex.setVoltage(u);
+
+          // Numerical state variable integration
+          x1 = x1 + T * (x2 - l1*(x1 - y));
+          x2 = x2 + T * (alpha*u - beta - l2*(x1 -y));
+          sigma = sigma + T*(y - curr_r + kappa*(uc -u));
         }
       }
     });
