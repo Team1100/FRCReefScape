@@ -30,7 +30,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 1.0
+                  "waitTime": 0.75
                 }
               },
               {
@@ -91,12 +91,6 @@
           "data": {
             "commands": [
               {
-                "type": "wait",
-                "data": {
-                  "waitTime": 1.0
-                }
-              },
-              {
                 "type": "named",
                 "data": {
                   "name": "FeedingTime"
@@ -105,7 +99,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "YoureUnderArrest"
+                  "name": "DriveForward"
                 }
               }
             ]
@@ -137,7 +131,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 1.0
+                  "waitTime": 0.75
                 }
               },
               {
@@ -198,12 +192,6 @@
           "data": {
             "commands": [
               {
-                "type": "wait",
-                "data": {
-                  "waitTime": 1.0
-                }
-              },
-              {
                 "type": "named",
                 "data": {
                   "name": "FeedingTime"
@@ -212,7 +200,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "YoureUnderArrest"
+                  "name": "DriveForward"
                 }
               }
             ]
@@ -244,7 +232,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 1.0
+                  "waitTime": 0.75
                 }
               },
               {

@@ -152,7 +152,7 @@ public class Lights extends SubsystemBase {
         Color color = Color.fromHSV(hue, 255, 128);
         Color interp = Color.lerpRGB(
           color,
-          new Color(255,255,255),
+          color,
           1.0-Math.abs(2.0*((m_timer.get()-start)/(end-start)-0.5))
         );
         m_LEDBuffer.setRGB(i, (int)(interp.red*255), (int)(interp.green*255), (int)(interp.blue*255));

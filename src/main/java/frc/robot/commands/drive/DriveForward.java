@@ -15,9 +15,9 @@ public class DriveForward extends Command {
   ChassisSpeeds m_Speeds;
 
   public DriveForward() {
-    super(Drive.getInstance(), "Auto Commands", "Drive Forward");
+    super(Drive.getInstance(), "Auto Commands", "DriveForward");
     m_drive = Drive.getInstance();
-    m_Speeds = new ChassisSpeeds(1.5, 0, 0);
+    m_Speeds = new ChassisSpeeds(0.8, 0, 0);
     addRequirements(m_drive);
   }
 
